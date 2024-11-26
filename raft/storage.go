@@ -183,6 +183,7 @@ func (ms *MemoryStorage) ApplySnapshot(snap pb.Snapshot) error {
 	}
 
 	ms.snapshot = snap
+	// apply 新的 snapshot 后，后面 ents 的数据全部清空
 	ms.ents = []pb.Entry{{Term: snap.Metadata.Term, Index: snap.Metadata.Index}}
 	return nil
 }

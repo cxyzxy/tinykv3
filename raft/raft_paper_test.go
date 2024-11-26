@@ -593,6 +593,7 @@ func TestFollowerCheckMessageType_MsgAppend2AB(t *testing.T) {
 		r.RaftLog.committed = 1
 		r.becomeFollower(2, 2)
 		msgs := r.readMessages() // clear message
+		t.Logf("Initial messages cleared: %+v", msgs)
 
 		r.Step(pb.Message{From: 2, To: 1, MsgType: pb.MessageType_MsgAppend, Term: 2, LogTerm: tt.term, Index: tt.index})
 

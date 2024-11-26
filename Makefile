@@ -58,7 +58,7 @@ project2: project2a project2b project2c
 
 project2a:
 	$(GOTEST) ./raft -run 2A
-
+	
 project2aa:
 	$(GOTEST) ./raft -run 2AA
 

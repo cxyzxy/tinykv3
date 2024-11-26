@@ -209,7 +209,7 @@ func (p *peer) Destroy(engine *engine_util.Engines, keepData bool) error {
 		return err
 	}
 	meta.WriteRegionState(kvWB, region, rspb.PeerState_Tombstone)
-	// write kv badgerDB first in case of restart happen between two write
+	// write kv rocksdb first in case of restart happen between two write
 	if err := kvWB.WriteToDB(engine.Kv); err != nil {
 		return err
 	}
@@ -268,7 +268,7 @@ func (p *peer) Send(trans Transport, msgs []eraftpb.Message) {
 	for _, msg := range msgs {
 		err := p.sendRaftMessage(msg, trans)
 		if err != nil {
-			log.Debugf("%v send message err: %v", p.Tag, err)
+			//log.Debugf("%v send message err: %v", p.Tag, err)
 		}
 	}
 }
@@ -370,7 +370,7 @@ func (p *peer) sendRaftMessage(msg eraftpb.Message, trans Transport) error {
 	if toPeer == nil {
 		return fmt.Errorf("failed to lookup recipient peer %v in region %v", msg.To, p.regionId)
 	}
-	log.Debugf("%v, send raft msg %v from %v to %v", p.Tag, msg.MsgType, fromPeer, toPeer)
+	//log.Debugf("%v, send raft msg %v from %v to %v", p.Tag, msg.MsgType, fromPeer, toPeer)
 
 	sendMsg.FromPeer = &fromPeer
 	sendMsg.ToPeer = toPeer

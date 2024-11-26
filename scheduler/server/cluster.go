@@ -279,8 +279,35 @@ func (c *RaftCluster) handleStoreHeartbeat(stats *schedulerpb.StoreStats) error 
 // processRegionHeartbeat updates the region information.
 func (c *RaftCluster) processRegionHeartbeat(region *core.RegionInfo) error {
 	// Your Code Here (3C).
+	oldRegion := c.GetRegion(region.GetID())
+	newEpoch := region.GetRegionEpoch()
 
+	if newEpoch == nil {
+		return nil
+	}
+
+	if oldRegion != nil {
+		originEpoch := oldRegion.GetRegionEpoch()
+		if isStaleRegionEpoch(newEpoch, originEpoch) {
+			return ErrRegionIsStale(region.GetMeta(), oldRegion.GetMeta())
+		}
+	}
+
+	// update
+	if err := c.putRegion(region); err != nil {
+		panic(err)
+	}
+	for i := range region.GetStoreIds() {
+		c.updateStoreStatusLocked(i)
+	}
 	return nil
+}
+
+func isStaleRegionEpoch(newEpoch *metapb.RegionEpoch, oldEpoch *metapb.RegionEpoch) bool {
+	if newEpoch.Version < oldEpoch.Version || newEpoch.ConfVer < oldEpoch.ConfVer {
+		return true
+	}
+	return false
 }
 
 func (c *RaftCluster) updateStoreStatusLocked(id uint64) {
